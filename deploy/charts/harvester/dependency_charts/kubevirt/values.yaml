@@ -15,7 +15,8 @@ fullnameOverride: ""
 ## Specify the specification of KubeVirt resource.
 ##
 spec:
-
+  monitorAccount: prometheus-operator-harvester
+  monitorNamespace: harvester-monitoring
   ## Specify the image tag of KubeVirt bundle components,
   ## defaults to the same tag as the operator image.
   ##

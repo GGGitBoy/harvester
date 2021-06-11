@@ -56,3 +56,18 @@ dependencies:
     version: 1.1.1
     repository: https://charts.longhorn.io
     condition: longhorn.enabled
+  - name: prometheus-operator
+    version: 0.1.0
+    repository: file://dependency_charts/prometheus-operator
+    condition: prometheus-operator.enabled
+    tags:
+      - prometheus
+      - operator
+  - name: prometheus
+    version: 0.1.0
+    repository: file://dependency_charts/prometheus
+    condition: prometheus.enabled
+    tags:
+      - prometheus
+      - crd
+
