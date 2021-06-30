@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/rancher/rancher/pkg/auth/audit"
 	"net/http"
 	"time"
 
@@ -207,6 +208,16 @@ func (s *HarvesterServer) generateSteveServer(options config.Options) error {
 		}
 		authMiddleware = md.ToAuthMiddleware()
 	}
+
+	AuditLogPath := "/var/log/auditlog/harvester-api-audit.log"
+	AuditLevel := 3
+	AuditLogMaxage := 10
+	AuditLogMaxbackup := 10
+	AuditLogMaxsize := 100
+
+	auditLogWriter := audit.NewLogWriter(AuditLogPath, AuditLevel, AuditLogMaxage, AuditLogMaxbackup, AuditLogMaxsize)
+	auditFilter := audit.NewAuditLogMiddleware(auditLogWriter)
+	authMiddleware.Chain(auditFilter)
 
 	router, err := NewRouter(scaled, s.RESTConfig, options, authMiddleware)
 	if err != nil {
