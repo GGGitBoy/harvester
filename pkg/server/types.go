@@ -217,9 +217,8 @@ func (s *HarvesterServer) generateSteveServer(options config.Options) error {
 
 	auditLogWriter := audit.NewLogWriter(AuditLogPath, AuditLevel, AuditLogMaxage, AuditLogMaxbackup, AuditLogMaxsize)
 	auditFilter := audit.NewAuditLogMiddleware(auditLogWriter)
-	authMiddleware.Chain(auditFilter)
 
-	router, err := NewRouter(scaled, s.RESTConfig, options, authMiddleware)
+	router, err := NewRouter(scaled, s.RESTConfig, options, authMiddleware.Chain(auditFilter))
 	if err != nil {
 		return err
 	}
