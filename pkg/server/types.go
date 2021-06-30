@@ -209,6 +209,11 @@ func (s *HarvesterServer) generateSteveServer(options config.Options) error {
 		authMiddleware = md.ToAuthMiddleware()
 	}
 
+	router, err := NewRouter(scaled, s.RESTConfig, options, authMiddleware)
+	if err != nil {
+		return err
+	}
+
 	AuditLogPath := "/var/log/auditlog/harvester-api-audit.log"
 	AuditLevel := 3
 	AuditLogMaxage := 10
@@ -218,14 +223,9 @@ func (s *HarvesterServer) generateSteveServer(options config.Options) error {
 	auditLogWriter := audit.NewLogWriter(AuditLogPath, AuditLevel, AuditLogMaxage, AuditLogMaxbackup, AuditLogMaxsize)
 	auditFilter := audit.NewAuditLogMiddleware(auditLogWriter)
 
-	router, err := NewRouter(scaled, s.RESTConfig, options, authMiddleware.Chain(auditFilter))
-	if err != nil {
-		return err
-	}
-
 	s.steve, err = steveserver.New(s.Context, s.RESTConfig, &steveserver.Options{
 		Controllers:     s.controllers,
-		AuthMiddleware:  authMiddleware,
+		AuthMiddleware:  authMiddleware.Chain(auditFilter),
 		Router:          router.Routes,
 		AccessSetLookup: s.ASL,
 	})
